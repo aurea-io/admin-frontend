@@ -12,4 +12,5 @@ if (parsedApiUrl.protocol !== 'https:' && !isLocalDevelopment) {
 export const env = {
   apiUrl: parsedApiUrl.toString().replace(/\/$/, ''),
   appName: import.meta.env.VITE_APP_NAME ?? 'Backoffice Aurea',
+  googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '',
 };

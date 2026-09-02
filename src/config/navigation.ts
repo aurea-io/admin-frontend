@@ -29,6 +29,15 @@ export const PLATFORM_NAV_CONFIG: NavItem[] = [
     requiredRole: 'platform_owner',
     requiredCapability: 'platform.tenants.read',
   },
+  {
+    id: 'catalog',
+    label: 'Planes y módulos',
+    icon: '◇',
+    href: '/platform/catalog',
+    scope: 'platform',
+    requiredRole: 'platform_owner',
+    requiredCapability: 'platform.features.read',
+  },
 ];
 
 export function filterNavByRole(items: NavItem[], userRole: PlatformRole): NavItem[] {

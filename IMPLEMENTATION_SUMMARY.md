@@ -9,7 +9,7 @@ Successfully implemented the login screen and main layout with role-based naviga
 
 1. **Real Authentication Flow**
    - Email/password login with backend integration
-   - Session persistence in localStorage
+   - In-memory access token with non-sensitive session metadata in localStorage
    - Automatic hydration on app load
    - 401 response handling with automatic logout
    - Form validation with clear error messages
@@ -81,10 +81,10 @@ Successfully implemented the login screen and main layout with role-based naviga
 
 #### ✅ Authentication (from flow.md)
 - Real backend endpoints used (`/auth/login`, `/auth/me`)
-- Session persisted securely
+- Access token kept in memory; session metadata persisted in localStorage. A page refresh requires authentication again until the backend cookie flow is available.
 - Automatic logout on 401 responses
 - No passwords stored in frontend
-- Tokens not exposed in logs
+- Access tokens are not persisted or exposed in logs
 
 #### ✅ Capabilities Architecture (from technical.md)
 - `capabilitiesStore.ts` for managing capabilities
@@ -118,7 +118,7 @@ Successfully implemented the login screen and main layout with role-based naviga
 
 ### 📊 Project Structure
 
-```
+```text
 backoffice-fe-aurea-internal/
 ├── src/
 │   ├── stores/

@@ -57,11 +57,11 @@ This PR implements the complete authentication flow and main navigation layout f
 ### ✅ Authentication (from flow.md, technical.md)
 
 - [x] Login uses real backend endpoint `/auth/login`
-- [x] Session persisted securely (JWT in localStorage, user in localStorage)
+- [x] Access token kept in memory; session metadata persisted in localStorage. A page refresh requires authentication again until the backend cookie flow is available.
 - [x] Session hydration on app load
 - [x] Automatic logout on 401 responses
 - [x] Password never stored in frontend
-- [x] Token not printed in logs
+- [x] Access token is not persisted or printed in logs
 - [x] Clear session validation feedback
 
 ### ✅ Capabilities Architecture (from flow.md, technical.md)
@@ -83,7 +83,7 @@ This PR implements the complete authentication flow and main navigation layout f
 ### ✅ Routing Structure
 
 - [x] Public route: `/login`
-- [x] Platform routes: `/platform/dashboard`, `/platform/tenants`, `/platform/modules`, `/platform/plans`
+- [x] Platform route: `/platform/dashboard`
 - [x] Error routes: `/403`, `/404`
 - [x] Protected routes with role checks
 - [x] Automatic redirect from `/` to `/platform/dashboard`
@@ -100,7 +100,7 @@ This PR implements the complete authentication flow and main navigation layout f
 
 ### File Structure
 
-```
+```text
 src/
 ├── stores/
 │   ├── authStore.ts          # Auth state with loading/error handling
@@ -176,8 +176,8 @@ src/
 
 ### Session Persistence
 
-- Token stored in `localStorage` with key `aurea-access-token`
-- User session stored in `localStorage` with key `aurea-session` (as JSON)
+- Access token kept in memory and removed from legacy `localStorage` storage on hydration
+- User session metadata stored in `localStorage` with key `aurea-session` (as JSON)
 - Automatic hydration on app load
 - Full cleanup on logout or 401 response
 
@@ -276,7 +276,7 @@ If upgrading from development version:
 ⚠️ **Recommendations:**
 - Always validate in backend (never trust client)
 - Implement HTTPS in production
-- Set secure HTTP-only cookies for tokens (future improvement)
+- Move authentication to secure HTTP-only cookies with CSRF protection when the backend supports it
 - Implement CSRF protection if needed
 - Add rate limiting to login endpoint
 
@@ -290,8 +290,7 @@ If upgrading from development version:
 ## Browser Compatibility
 
 - Modern browsers with ES2020+ support
-- localStorage required
-- localStorage fallback to session-only if needed (future)
+- localStorage is used only for non-sensitive session metadata
 
 ---
 

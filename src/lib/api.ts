@@ -1,5 +1,6 @@
 import axios, { type AxiosError } from 'axios';
 import { env } from '../config/env';
+import { useAuthStore } from '../stores/authStore';
 
 const api = axios.create({
   baseURL: env.apiUrl,
@@ -11,7 +12,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('aurea-access-token');
+  const token = useAuthStore.getState().accessToken;
 
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -24,8 +25,7 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('aurea-access-token');
-      localStorage.removeItem('aurea-session');
+      useAuthStore.getState().logout();
       window.location.href = '/login';
     }
 
@@ -34,7 +34,7 @@ api.interceptors.response.use(
 );
 
 export const getAuthHeaders = () => {
-  const token = localStorage.getItem('aurea-access-token');
+  const token = useAuthStore.getState().accessToken;
 
   return token ? { Authorization: `Bearer ${token}` } : {};
 };

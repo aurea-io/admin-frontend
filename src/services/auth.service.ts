@@ -1,4 +1,6 @@
 import api from '../lib/api';
+import axios from 'axios';
+import { useAuthStore } from '../stores/authStore';
 import type { AuthResponse, UserSession, CapabilitiesResponse } from '../types/auth';
 
 export const authService = {
@@ -25,8 +27,11 @@ export const authService = {
       const response = await api.get<CapabilitiesResponse>('/auth/capabilities');
       return response.data;
     } catch (error) {
-      // If capabilities endpoint doesn't exist yet, return empty object
-      console.warn('Capabilities endpoint not available yet', error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        useAuthStore.getState().logout();
+      } else {
+        console.warn('Capabilities endpoint not available yet');
+      }
       return {};
     }
   },

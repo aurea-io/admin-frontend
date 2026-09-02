@@ -20,38 +20,6 @@ export const PLATFORM_NAV_CONFIG: NavItem[] = [
     scope: 'platform',
     requiredRole: ['platform_owner', 'platform_operator'],
   },
-  {
-    id: 'tenants',
-    label: 'Tenants',
-    icon: '▣',
-    href: '/platform/tenants',
-    scope: 'platform',
-    requiredRole: 'platform_owner',
-  },
-  {
-    id: 'modules',
-    label: 'Módulos',
-    icon: '▤',
-    href: '/platform/modules',
-    scope: 'platform',
-    requiredRole: 'platform_owner',
-  },
-  {
-    id: 'plans',
-    label: 'Planes',
-    icon: '⚙',
-    href: '/platform/plans',
-    scope: 'platform',
-    requiredRole: 'platform_owner',
-  },
-  {
-    id: 'settings',
-    label: 'Configuración',
-    icon: '⚙',
-    href: '/platform/settings',
-    scope: 'platform',
-    requiredRole: 'platform_owner',
-  },
 ];
 
 export function filterNavByRole(items: NavItem[], userRole: PlatformRole): NavItem[] {

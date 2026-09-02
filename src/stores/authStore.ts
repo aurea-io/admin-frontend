@@ -30,7 +30,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   error: null,
   
   setSession: (accessToken: string, user: UserSession) => {
-    localStorage.setItem(STORAGE_KEYS.token, accessToken);
     localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(user));
 
     set({ accessToken, user, isAuthenticated: true, hydrated: true, error: null });
@@ -52,11 +51,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   
   hydrate: async () => {
     set({ isLoading: true });
-    
-    const token = localStorage.getItem(STORAGE_KEYS.token);
+    localStorage.removeItem(STORAGE_KEYS.token);
     const rawUser = localStorage.getItem(STORAGE_KEYS.session);
 
-    if (!token || !rawUser) {
+    if (!rawUser) {
       set({ 
         accessToken: null, 
         user: null, 
@@ -68,11 +66,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     try {
-      const user = JSON.parse(rawUser) as UserSession;
-      set({ 
-        accessToken: token, 
-        user, 
-        isAuthenticated: true, 
+      JSON.parse(rawUser) as UserSession;
+      set({
+        accessToken: null,
+        user: null,
+        isAuthenticated: false,
         hydrated: true,
         isLoading: false,
       });

@@ -215,7 +215,7 @@ export function LoginPage() {
           <button
             type="button"
             className="auth-google-btn"
-            disabled={isLoading}
+            disabled
             onClick={() => {
               // TODO: Implement Google login flow
               console.log('Google login clicked');

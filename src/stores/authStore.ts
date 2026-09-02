@@ -9,17 +9,12 @@ interface AuthState {
   isLoading: boolean;
   error: LoginError | null;
   setSession: (accessToken: string, user: UserSession) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   hydrate: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: LoginError | null) => void;
   clearError: () => void;
 }
-
-const STORAGE_KEYS = {
-  token: 'aurea-access-token',
-  session: 'aurea-session',
-};
 
 export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
@@ -30,15 +25,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   error: null,
   
   setSession: (accessToken: string, user: UserSession) => {
-    localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(user));
-
     set({ accessToken, user, isAuthenticated: true, hydrated: true, error: null });
   },
   
-  logout: () => {
-    localStorage.removeItem(STORAGE_KEYS.token);
-    localStorage.removeItem(STORAGE_KEYS.session);
-
+  logout: async () => {
+    try {
+      const { authService } = await import('../services/auth.service');
+      await authService.logout();
+    } catch {
+      // Local cleanup is required even when the server is unreachable.
+    }
     set({ 
       accessToken: null, 
       user: null, 
@@ -51,32 +47,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   
   hydrate: async () => {
     set({ isLoading: true });
-    localStorage.removeItem(STORAGE_KEYS.token);
-    const rawUser = localStorage.getItem(STORAGE_KEYS.session);
-
-    if (!rawUser) {
-      set({ 
-        accessToken: null, 
-        user: null, 
-        isAuthenticated: false, 
-        hydrated: true,
-        isLoading: false,
-      });
-      return;
-    }
-
     try {
-      JSON.parse(rawUser) as UserSession;
+      const { authService } = await import('../services/auth.service');
+      const { accessToken, user } = await authService.refresh();
       set({
-        accessToken: null,
-        user: null,
-        isAuthenticated: false,
+        accessToken,
+        user,
+        isAuthenticated: true,
         hydrated: true,
         isLoading: false,
       });
     } catch {
-      localStorage.removeItem(STORAGE_KEYS.token);
-      localStorage.removeItem(STORAGE_KEYS.session);
       set({ 
         accessToken: null, 
         user: null, 

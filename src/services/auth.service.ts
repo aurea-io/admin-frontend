@@ -22,6 +22,15 @@ export const authService = {
     return response.data;
   },
 
+  async refresh(): Promise<AuthResponse> {
+    const response = await api.post<AuthResponse>('/auth/refresh');
+    return response.data;
+  },
+
+  async logout(): Promise<void> {
+    await api.post('/auth/logout');
+  },
+
   async getCapabilities(): Promise<CapabilitiesResponse> {
     try {
       const response = await api.get<CapabilitiesResponse>('/auth/capabilities');

@@ -1,4 +1,4 @@
-import api from '../lib/api';
+import api, { refreshAccessToken } from '../lib/api';
 import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
 import type { AuthResponse, UserSession, CapabilitiesResponse } from '../types/auth';
@@ -23,8 +23,7 @@ export const authService = {
   },
 
   async refresh(): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/refresh');
-    return response.data;
+    return refreshAccessToken();
   },
 
   async logout(): Promise<void> {

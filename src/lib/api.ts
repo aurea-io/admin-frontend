@@ -1,6 +1,7 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { env } from '../config/env';
 import { useAuthStore } from '../stores/authStore';
+import type { AuthResponse } from '../types/auth';
 
 const api = axios.create({
   baseURL: env.apiUrl,
@@ -25,14 +26,14 @@ api.interceptors.request.use((config) => {
 type RetriableRequest = InternalAxiosRequestConfig & { _refreshRetried?: boolean };
 
 const authPaths = ['/auth/login', '/auth/google', '/auth/refresh', '/auth/logout'];
-let refreshPromise: Promise<string> | null = null;
+let refreshPromise: Promise<AuthResponse> | null = null;
 
-const refreshAccessToken = async (): Promise<string> => {
+export const refreshAccessToken = async (): Promise<AuthResponse> => {
   if (!refreshPromise) {
-    refreshPromise = api.post<{ accessToken: string; user: import('../types/auth').UserSession }>('/auth/refresh')
+    refreshPromise = api.post<AuthResponse>('/auth/refresh')
       .then(({ data }) => {
         useAuthStore.getState().setSession(data.accessToken, data.user);
-        return data.accessToken;
+        return data;
       })
       .finally(() => { refreshPromise = null; });
   }
@@ -49,8 +50,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && request && !request._refreshRetried && !skipRefresh) {
       request._refreshRetried = true;
       try {
-        const token = await refreshAccessToken();
-        request.headers.Authorization = `Bearer ${token}`;
+        const { accessToken } = await refreshAccessToken();
+        request.headers.Authorization = `Bearer ${accessToken}`;
         return api(request);
       } catch {
         await useAuthStore.getState().logout();

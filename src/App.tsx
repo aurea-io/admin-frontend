@@ -5,6 +5,8 @@ import { useAuthStore } from './stores/authStore';
 import { Loader } from './components/ui/Loader';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { ForbiddenPage } from './pages/ForbiddenPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 function AppRoutes() {
   const hydrate = useAuthStore((state) => state.hydrate);
@@ -21,16 +23,32 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Platform scope routes */}
         <Route
-          path="/"
+          path="/platform/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredRole={['platform_owner', 'platform_operator']}>
               <DashboardPage />
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
+
+        {/* Root redirect */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Navigate to="/platform/dashboard" replace />
+          </ProtectedRoute>
+        } />
+
+        {/* Error pages */}
+        <Route path="/403" element={<ForbiddenPage />} />
+        <Route path="/404" element={<NotFoundPage />} />
+
+        {/* Catch all - 404 */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

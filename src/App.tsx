@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ForbiddenPage } from './pages/ForbiddenPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { TenantsPage } from './pages/TenantsPage';
 
 function AppRoutes() {
   const hydrate = useAuthStore((state) => state.hydrate);
@@ -32,6 +33,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute requiredRole={['platform_owner', 'platform_operator']}>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/platform/tenants"
+          element={
+            <ProtectedRoute requiredRole={['platform_owner', 'platform_operator']}>
+              <TenantsPage />
             </ProtectedRoute>
           }
         />

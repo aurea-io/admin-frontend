@@ -20,6 +20,15 @@ export const PLATFORM_NAV_CONFIG: NavItem[] = [
     scope: 'platform',
     requiredRole: ['platform_owner', 'platform_operator'],
   },
+  {
+    id: 'tenants',
+    label: 'Tenants',
+    icon: '▦',
+    href: '/platform/tenants',
+    scope: 'platform',
+    requiredRole: 'platform_owner',
+    requiredCapability: 'platform.tenants.read',
+  },
 ];
 
 export function filterNavByRole(items: NavItem[], userRole: PlatformRole): NavItem[] {

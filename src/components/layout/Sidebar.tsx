@@ -70,9 +70,9 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
 
   if (!user) return null;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     onCloseMobile();
-    logout();
+    await logout();
     navigate('/login', { replace: true });
   };
 

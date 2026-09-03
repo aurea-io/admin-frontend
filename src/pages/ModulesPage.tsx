@@ -308,7 +308,7 @@ export function ModulesPage() {
       kind: createKind,
       moduleKey: createModuleKey.trim().toLowerCase() || createPage.trim().toLowerCase(),
       sectionKey: createSection,
-      pageKey: createPage.trim().toLowerCase() || null,
+      pageKey: createPage.trim().toLowerCase() || undefined,
       scope: createScope,
       name: createName.trim(),
       description: createDesc.trim() || undefined,

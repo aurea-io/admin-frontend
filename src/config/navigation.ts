@@ -3,7 +3,7 @@ import type { PlatformRole } from '../types/auth';
 export interface NavItem {
   id: string;
   label: string;
-  iconType: 'plans' | 'tenants' | 'modules' | 'maintenance' | 'audit' | 'dashboard';
+  iconType: 'plans' | 'tenants' | 'modules' | 'dashboard';
   href: string;
   scope: 'platform' | 'tenant';
   requiredRole?: PlatformRole | PlatformRole[];
@@ -41,22 +41,6 @@ export const PLATFORM_NAV_CONFIG: NavItem[] = [
     label: 'Módulos y funciones',
     iconType: 'modules',
     href: '/platform/modules',
-    scope: 'platform',
-    requiredRole: ['platform_owner', 'platform_operator'],
-  },
-  {
-    id: 'maintenance',
-    label: 'Mantenimiento',
-    iconType: 'maintenance',
-    href: '/platform/maintenance',
-    scope: 'platform',
-    requiredRole: ['platform_owner', 'platform_operator'],
-  },
-  {
-    id: 'audit',
-    label: 'Auditoría',
-    iconType: 'audit',
-    href: '/platform/audit',
     scope: 'platform',
     requiredRole: ['platform_owner', 'platform_operator'],
   },

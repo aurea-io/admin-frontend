@@ -8,7 +8,7 @@ interface TopbarProps {
   isMobileMenuOpen?: boolean;
 }
 
-export function Topbar({}: TopbarProps) {
+export function Topbar({ onToggleMobileMenu, isMobileMenuOpen }: TopbarProps) {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const { theme, toggleTheme } = useThemeMode();
@@ -26,8 +26,8 @@ export function Topbar({}: TopbarProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login', { replace: true });
   };
 
@@ -44,8 +44,23 @@ export function Topbar({}: TopbarProps) {
 
   return (
     <header className="app-topbar">
-      {/* IZQUIERDA: Marca, Logo e Identidad Aurea con enlace al Inicio */}
+      {/* IZQUIERDA: Mobile Toggle, Marca, Logo e Identidad Aurea con enlace al Inicio */}
       <div className="app-topbar__left">
+        {onToggleMobileMenu && (
+          <button
+            type="button"
+            className="app-topbar__menu-toggle"
+            onClick={onToggleMobileMenu}
+            aria-expanded={!!isMobileMenuOpen}
+            aria-label="Abrir menú de navegación"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        )}
         <Link to="/platform/dashboard" className="app-topbar__brand-link" title="Ir al Inicio / Dashboard">
           <div className="app-topbar__brand">
             <div className="app-topbar__logo-icon">

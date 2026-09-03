@@ -31,6 +31,7 @@ export function LoginPage() {
   });
 
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [googleButtonReady, setGoogleButtonReady] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export function LoginPage() {
         width: 420,
         text: 'continue_with',
       });
+      setGoogleButtonReady(true);
     };
 
     if (window.google) {
@@ -80,7 +82,10 @@ export function LoginPage() {
     script.async = true;
     script.defer = true;
     script.onload = renderGoogleButton;
-    script.onerror = () => setError('network_error');
+    script.onerror = () => {
+      setGoogleButtonReady(false);
+      setError('network_error');
+    };
     document.head.appendChild(script);
     return () => script.remove();
   }, [clearError, isLoading, navigate, setCapabilities, setError, setLoading, setSession]);
@@ -281,9 +286,16 @@ export function LoginPage() {
             <span>o continúa con</span>
           </div>
 
-          {env.googleClientId ? (
-            <div ref={googleButtonRef} className="auth-google-container" aria-label="Continuar con Google" />
-          ) : (
+          {env.googleClientId && (
+            <div
+              ref={googleButtonRef}
+              className="auth-google-container"
+              aria-label="Continuar con Google"
+              style={{ display: googleButtonReady ? 'block' : 'none' }}
+            />
+          )}
+
+          {(!env.googleClientId || !googleButtonReady) && (
             <button
               type="button"
               className="auth-google-btn"

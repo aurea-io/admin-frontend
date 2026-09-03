@@ -1,28 +1,35 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import { Topbar } from './Topbar';
 import { Sidebar } from './Sidebar';
+import { BottomNav } from './BottomNav';
 
 interface AppShellProps {
   children: ReactNode;
-  pageTitle: string;
+  pageTitle?: string;
   topbarActions?: ReactNode;
 }
 
-export function AppShell({ children, pageTitle, topbarActions }: AppShellProps) {
+export function AppShell({ children }: AppShellProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
-    <div className="app-shell">
-      <Sidebar />
-      <div className="app-shell__content">
-        <div className="topbar">
-          <div>
-            <p className="topbar__eyebrow">Backoffice interno</p>
-            <h2>{pageTitle}</h2>
+    <div className="app-layout">
+      <Topbar
+        isMobileMenuOpen={isMobileMenuOpen}
+        onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      />
+      <div className="app-layout__body">
+        <Sidebar
+          isMobileOpen={isMobileMenuOpen}
+          onCloseMobile={() => setIsMobileMenuOpen(false)}
+        />
+        <main className="app-layout__main">
+          <div className="app-layout__container">
+            {children}
           </div>
-          <div className="topbar__actions">
-            {topbarActions}
-          </div>
-        </div>
-        <main className="page-content">{children}</main>
+        </main>
       </div>
+      <BottomNav />
     </div>
   );
 }

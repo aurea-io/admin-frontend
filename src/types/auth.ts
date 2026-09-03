@@ -20,4 +20,4 @@ export interface CapabilitiesResponse {
   [key: string]: boolean;
 }
 
-export type LoginError = 'invalid_credentials' | 'user_inactive' | 'network_error' | 'unknown_error';
+export type LoginError = 'invalid_credentials' | 'user_inactive' | 'network_error' | 'google_not_configured' | 'unknown_error';

@@ -3,7 +3,7 @@ import type { PlatformRole } from '../types/auth';
 export interface NavItem {
   id: string;
   label: string;
-  icon: string;
+  iconType: 'plans' | 'tenants' | 'modules' | 'dashboard';
   href: string;
   scope: 'platform' | 'tenant';
   requiredRole?: PlatformRole | PlatformRole[];
@@ -14,36 +14,41 @@ export interface NavItem {
 export const PLATFORM_NAV_CONFIG: NavItem[] = [
   {
     id: 'dashboard',
-    label: 'Resumen',
-    icon: '◫',
+    label: 'Inicio',
+    iconType: 'dashboard',
     href: '/platform/dashboard',
+    scope: 'platform',
+    requiredRole: ['platform_owner', 'platform_operator'],
+  },
+  {
+    id: 'plans',
+    label: 'Planes y membresías',
+    iconType: 'plans',
+    href: '/platform/plans',
     scope: 'platform',
     requiredRole: ['platform_owner', 'platform_operator'],
   },
   {
     id: 'tenants',
     label: 'Tenants',
-    icon: '▦',
+    iconType: 'tenants',
     href: '/platform/tenants',
     scope: 'platform',
-    requiredRole: 'platform_owner',
-    requiredCapability: 'platform.tenants.read',
+    requiredRole: ['platform_owner', 'platform_operator'],
   },
   {
-    id: 'catalog',
-    label: 'Planes y módulos',
-    icon: '◇',
-    href: '/platform/catalog',
+    id: 'modules',
+    label: 'Módulos y funciones',
+    iconType: 'modules',
+    href: '/platform/modules',
     scope: 'platform',
-    requiredRole: 'platform_owner',
-    requiredCapability: 'platform.features.read',
+    requiredRole: ['platform_owner', 'platform_operator'],
   },
 ];
 
 export function filterNavByRole(items: NavItem[], userRole: PlatformRole): NavItem[] {
   return items.filter((item) => {
     if (!item.requiredRole) return true;
-    
     const roles = Array.isArray(item.requiredRole) ? item.requiredRole : [item.requiredRole];
     return roles.includes(userRole);
   });

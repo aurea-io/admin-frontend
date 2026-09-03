@@ -4,40 +4,70 @@
   --color-bg-strong: #eae2db;
   --color-surface: #f9f7f5;
   --color-surface-strong: #ffffff;
-  --color-surface-muted: #f1ece7;
+  --color-surface-subtle: #f2ece4;
+  --color-surface-muted: #e9e2d8;
   --color-border: #d6c9bf;
+  --color-border-subtle: #e4d8ce;
   --color-text: #2d2a2d;
-  --color-text-soft: #5d5857;
+  --color-text-secondary: #585354;
+  --color-text-soft: #756e6d;
+  --color-text-muted: #9c9593;
   --color-brand: #d8704d;
   --color-brand-strong: #c85a32;
   --color-brand-soft: #f5d8d0;
+  --color-brand-border: #e8b6a8;
   --color-success: #4b7f5d;
   --color-success-soft: #dfeee4;
+  --color-success-border: #b8dec4;
   --color-warning: #d7a24d;
   --color-warning-soft: #f9eed9;
   --color-danger: #c95a4d;
   --color-danger-soft: #f7dfe0;
   --color-shadow: rgba(29, 24, 20, 0.08);
+
+  /* Sidebar Theme (Light Mode) */
+  --color-sidebar-bg: #fbf8f4;
+  --color-sidebar-surface: #f2eae0;
+  --color-sidebar-border: #ded2c5;
+  --color-sidebar-text: #2d2a2d;
+  --color-sidebar-muted: #6b6462;
+  --color-sidebar-hover: #ede2d5;
+  --color-sidebar-active: #d8704d;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-bg: #171a1d;
-  --color-bg-strong: #1f252b;
+  --color-bg: #121518;
+  --color-bg-strong: #181d22;
   --color-surface: #1b2127;
-  --color-surface-strong: #202830;
-  --color-surface-muted: #242d35;
-  --color-border: #37414c;
+  --color-surface-strong: #222932;
+  --color-surface-subtle: #242c35;
+  --color-surface-muted: #2d3742;
+  --color-border: #35404d;
+  --color-border-subtle: #2a3440;
   --color-text: #edf1f5;
-  --color-text-soft: #b6c0ca;
+  --color-text-secondary: #c2cdd7;
+  --color-text-soft: #9ba8b5;
+  --color-text-muted: #6e7b88;
   --color-brand: #e88d6f;
   --color-brand-strong: #f3a07f;
   --color-brand-soft: rgba(232, 141, 111, 0.18);
+  --color-brand-border: rgba(232, 141, 111, 0.35);
   --color-success: #78b68a;
   --color-success-soft: rgba(120, 182, 138, 0.18);
+  --color-success-border: rgba(120, 182, 138, 0.35);
   --color-warning: #e9bb62;
   --color-warning-soft: rgba(233, 187, 98, 0.16);
   --color-danger: #de7269;
   --color-danger-soft: rgba(222, 114, 105, 0.18);
-  --color-shadow: rgba(0, 0, 0, 0.25);
+  --color-shadow: rgba(0, 0, 0, 0.4);
+
+  /* Sidebar Theme (Dark Mode) */
+  --color-sidebar-bg: #0e1114;
+  --color-sidebar-surface: #171c22;
+  --color-sidebar-border: #232b35;
+  --color-sidebar-text: #edf1f5;
+  --color-sidebar-muted: #8e9ca8;
+  --color-sidebar-hover: #1c232b;
+  --color-sidebar-active: #d8704d;
 }

@@ -1,0 +1,191 @@
+name: Build and deploy admin-frontend # Release deployment contract
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release-tag:
+        description: Release tag to deploy
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-admin-frontend-production
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/aurea-io/aurea-admin-frontend
+  CONTAINER_NAME: aurea-frontend
+  APP_PORT: '80'
+
+jobs:
+  verify:
+    name: Verify frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.release-tag || github.event.release.tag_name || github.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+
+  publish:
+    name: Publish Docker image
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      revision: ${{ steps.revision.outputs.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.release-tag || github.event.release.tag_name || github.ref }}
+          persist-credentials: false
+      - name: Capture deployed revision
+        id: revision
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051
+        id: meta
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=long,prefix=
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            AUREA_COMMIT_ID=${{ steps.revision.outputs.sha }}
+            # Keep production auth working even if the repository variable is absent.
+            VITE_API_URL=${{ vars.VITE_API_URL || 'https://aurea-admin-frontend.onrender.com/api' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    environment: production
+    name: Deploy frontend to Vercel
+    needs: publish
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.config.outputs.configured }}
+      reason: ${{ steps.config.outputs.reason }}
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ inputs.release-tag || github.event.release.tag_name || github.ref }}
+          persist-credentials: false
+      - name: Check Vercel configuration
+        id: config
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://aurea-admin-frontend.onrender.com/api' }}
+        run: |
+          if [[ -n "$VERCEL_TOKEN" && -n "$VERCEL_ORG_ID" && -n "$VERCEL_PROJECT_ID" && -n "$VITE_API_URL" ]]; then
+            echo 'configured=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'configured=false' >> "$GITHUB_OUTPUT"
+            echo 'reason=Faltan VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID o VITE_API_URL en la configuración de Actions.' >> "$GITHUB_OUTPUT"
+            echo 'Deploy frontend omitido: falta la configuración de Vercel o VITE_API_URL.'
+          fi
+      - name: Deploy to Vercel
+        if: steps.config.outputs.configured == 'true'
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://aurea-admin-frontend.onrender.com/api' }}
+        run: |
+          set -euo pipefail
+          mkdir -p .vercel
+          jq -n --arg project "$VERCEL_PROJECT_ID" --arg org "$VERCEL_ORG_ID" '{projectId: $project, orgId: $org}' > .vercel/project.json
+          response="$(npx --yes vercel@59.10.0 --prod --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" --yes --build-env "VITE_API_URL=${VITE_API_URL}")"
+          printf '%s\n' "$response"
+          url="$(grep -Eo 'https://[[:alnum:].-]+\.vercel\.app' <<<"$response" | tail -1)"
+          [[ -n "$url" ]] || { echo 'Vercel no devolvió la URL de deployment.' >&2; exit 1; }
+          echo "url=https://${url#https://}" >> "$GITHUB_OUTPUT"
+
+  smoke-test:
+    name: Smoke test frontend
+    environment: production
+    if: ${{ always() && needs.deploy.result == 'success' && needs.deploy.outputs.configured == 'true' }}
+    needs: [deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      FRONTEND_URL: ${{ needs.deploy.outputs.url }}
+    steps:
+      - name: Wait for frontend response
+        run: |
+          set -euo pipefail
+          for attempt in {1..16}; do
+            if curl --fail --silent --show-error --max-time 15 "${FRONTEND_URL}/" >/dev/null; then exit 0; fi
+            sleep 15
+          done
+          echo "Frontend smoke test failed at ${FRONTEND_URL}/" >&2
+          exit 1
+
+  notify-image:
+    name: Notify image
+    if: ${{ always() && needs.verify.result != 'skipped' }}
+    needs: [verify, publish]
+    uses: aurea-io/aurea-ci/.github/workflows/notify.yml@main
+    with:
+      event-type: image
+      environment: production
+      image: ghcr.io/aurea-io/aurea-admin-frontend
+      version: ${{ inputs.release-tag || github.event.release.tag_name || format('manual-{0}', github.run_number) }}
+      source-commit: ${{ needs.publish.outputs.revision }}
+      commit-message: ${{ github.event.release.name || github.event.release.tag_name || github.event.head_commit.message || 'workflow dispatch' }}
+      status: ${{ needs.publish.result == 'success' && needs.verify.result == 'success' && 'success' || 'failure' }}
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+  notify-deploy:
+    name: Notify deploy
+    if: ${{ always() && needs.deploy.result != 'skipped' }}
+    needs: [publish, deploy, smoke-test, notify-image]
+    uses: aurea-io/aurea-ci/.github/workflows/notify.yml@main
+    with:
+      event-type: deploy
+      environment: production
+      version: ${{ inputs.release-tag || github.event.release.tag_name || format('manual-{0}', github.run_number) }}
+      source-commit: ${{ needs.publish.outputs.revision }}
+      deploy-url: ${{ needs.deploy.outputs.url }}
+      commit-message: ${{ github.event.release.name || github.event.release.tag_name || github.event.head_commit.message || 'workflow dispatch' }}
+      status: ${{ needs.deploy.outputs.configured == 'false' && 'skipped' || needs.smoke-test.result == 'success' && 'success' || 'failure' }}
+      reason: ${{ needs.deploy.outputs.configured == 'false' && needs.deploy.outputs.reason || needs.deploy.result == 'failure' && 'El deploy a Vercel falló.' || needs.smoke-test.result == 'failure' && 'El smoke test del frontend falló.' || '' }}
+      discord-message-id: ${{ needs.notify-image.outputs.discord-message-id }}
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+      DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

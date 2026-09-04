@@ -54,6 +54,12 @@ export const INITIAL_CANONICAL_PLANS: PlatformPlan[] = [
         isActive: true,
       },
       {
+        currency: 'ARS',
+        amount: 290000,
+        interval: 'yearly',
+        isActive: true,
+      },
+      {
         currency: 'USD',
         amount: 290,
         interval: 'yearly',
@@ -120,6 +126,12 @@ export const INITIAL_CANONICAL_PLANS: PlatformPlan[] = [
         currency: 'USD',
         amount: 160,
         interval: 'quarterly',
+        isActive: true,
+      },
+      {
+        currency: 'ARS',
+        amount: 590000,
+        interval: 'yearly',
         isActive: true,
       },
       {
@@ -193,6 +205,12 @@ export const INITIAL_CANONICAL_PLANS: PlatformPlan[] = [
         currency: 'USD',
         amount: 405,
         interval: 'quarterly',
+        isActive: true,
+      },
+      {
+        currency: 'ARS',
+        amount: 1490000,
+        interval: 'yearly',
         isActive: true,
       },
       {

@@ -2502,7 +2502,7 @@
   color: var(--color-text);
   margin: 0;
   line-height: 1.25;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .plan-overview-card__key {

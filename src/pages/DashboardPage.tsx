@@ -56,54 +56,48 @@ export function DashboardPage() {
         <div className="plan-card">
           <h3 className="plan-card__title">Accesos directos</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <Link
-              to="/platform/plans"
-              className="tree-folder"
-              style={{ padding: '10px 12px', border: '1px solid var(--color-border)' }}
-            >
-              <span className="tree-folder__title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="2">
-                  <rect x="2" y="5" width="20" height="14" rx="2" />
-                  <line x1="2" y1="10" x2="22" y2="10" />
-                </svg>
+            <Link to="/platform/plans" className="dashboard-quick-link">
+              <div className="dashboard-quick-link__content">
+                <div className="dashboard-quick-link__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                    <line x1="2" y1="10" x2="22" y2="10" />
+                  </svg>
+                </div>
                 <span>Planes y membresías</span>
-              </span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--color-text-soft)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
 
-            <Link
-              to="/platform/modules"
-              className="tree-folder"
-              style={{ padding: '10px 12px', border: '1px solid var(--color-border)' }}
-            >
-              <span className="tree-folder__title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="2">
-                  <rect x="3" y="3" width="7" height="7" rx="1.5" />
-                  <rect x="14" y="3" width="7" height="7" rx="1.5" />
-                  <rect x="14" y="14" width="7" height="7" rx="1.5" />
-                  <rect x="3" y="14" width="7" height="7" rx="1.5" />
-                </svg>
+            <Link to="/platform/modules" className="dashboard-quick-link">
+              <div className="dashboard-quick-link__content">
+                <div className="dashboard-quick-link__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                  </svg>
+                </div>
                 <span>Catálogo de módulos y funciones</span>
-              </span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--color-text-soft)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
 
-            <Link
-              to="/platform/tenants"
-              className="tree-folder"
-              style={{ padding: '10px 12px', border: '1px solid var(--color-border)' }}
-            >
-              <span className="tree-folder__title">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="2">
-                  <path d="M3 21h18M3 7v14M21 7v14M7 21V3h10v18M11 7h2M11 11h2M11 15h2" />
-                </svg>
+            <Link to="/platform/tenants" className="dashboard-quick-link">
+              <div className="dashboard-quick-link__content">
+                <div className="dashboard-quick-link__icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 21h18M3 7v14M21 7v14M7 21V3h10v18M11 7h2M11 11h2M11 15h2" />
+                  </svg>
+                </div>
                 <span>Directorio de tenants</span>
-              </span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--color-text-soft)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
